@@ -1,0 +1,78 @@
+from ._anvil_designer import Form1Template
+from anvil import *
+import anvil.server
+import anvil.image
+import anvil.media
+
+
+class Form1(Form1Template):
+  def __init__(self, **properties):
+    # Set Form properties and Data Bindings.
+    self.init_components(**properties)
+    self.text_box_1.visible = False
+    # self.imageInput.show = self.image_2_show  # Assign the show event handler
+
+    # Any code you write here will run before the form opens.
+
+  
+  def input_change(self, files, **event_args):
+    """This method is called when a new file is loaded into this FileLoader"""
+    anvil.server.call('clearPrevious')
+    
+    multipleFiles = self.input.files
+    c = 1
+    
+    for file in multipleFiles:
+      uploaded_image = file
+      self.imageInput.source = uploaded_image
+      anvil.server.call('save_input', uploaded_image, c)
+
+      anvil.server.call('saveCounter',c)
+      c=c+1
+
+    n = Notification("Image Successfully Uploaded to the Server")
+    n.show()
+
+    numberOfInputs = anvil.server.call('numberOfOutputs')
+    self.text_box_1.visible = True
+    self.text_box_1.text = 'Detected the Total Number of '+str(numberOfInputs)+' Inputs.'
+    
+    # flipped_image = anvil.server.call('process_image', uploaded_image)
+    # self.imageOutput.source = flipped_image
+
+  def detect_click(self, **event_args):
+    # detection = anvil.server.call('process_image')
+    numberOfOutputs = anvil.server.call('numberOfOutputs')
+    
+    # if detection:
+    for n in range(numberOfOutputs+1):
+      if n == 1:
+        detection = anvil.server.call('process_image',n)
+        self.imageOutput1.visible = True
+        self.imageOutput1.source = detection
+      if n == 2:
+        detection = anvil.server.call('process_image',n)
+        self.imageOutput2.visible = True
+        self.imageOutput2.source = detection
+      if n == 3:
+        detection = anvil.server.call('process_image',n)
+        self.imageOutput3.visible = True
+        self.imageOutput3.source = detection
+      if n == 4:
+        detection = anvil.server.call('process_image',n)
+        self.imageOutput4.visible = True
+        self.imageOutput4.source = detection
+      
+    n = Notification("Detections Successfully Predicted")
+    n.show()
+
+
+
+
+
+    
+
+
+
+
+
